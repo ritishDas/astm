@@ -73,14 +73,36 @@ void cmdList() {
             std::cout << p.path().filename().string() << "\n";
 }
 
+void cmdRemove(const std::string& name) {
+    fs::path target = assetsDir / name;
+    if (!fs::exists(target)) {
+        std::cerr << "Asset not found: " << name << "\n";
+        return;
+    }
+
+    fs::remove_all(target);
+    std::cout << "Removed asset: " << name << "\n";
+
+    // --- Git Auto Commit & Push ---
+    fs::current_path(baseDir);
+    if (fs::exists(baseDir / ".git")) {
+        std::system("git add -A");
+        std::string commitCmd = "git commit -m \"Remove asset " + name + "\"";
+        std::system(commitCmd.c_str());
+        std::system("git push");
+        std::cout << "Committed and pushed removal.\n";
+    }
+}
+
 int main(int argc, char** argv) {
     if (argc < 2) {
         std::cout << "Usage: astm <command> [args]\n"
                   << "Commands:\n"
-                  << "  init <path>   - Set destination path\n"
+                  << "  init <path>       - Set destination path\n"
                   << "  add <name> <path> - Add new asset\n"
-                  << "  fetch <name>  - Copy asset to destination\n"
-                  << "  list          - Show all assets\n";
+                  << "  fetch <name>      - Copy asset to destination\n"
+                  << "  remove <name>     - Delete an asset\n"
+                  << "  list              - Show all assets\n";
         return 0;
     }
 
@@ -90,6 +112,7 @@ int main(int argc, char** argv) {
     if (cmd == "init" && argc >= 3) cmdInit(argv[2]);
     else if (cmd == "add" && argc >= 4) cmdAdd(argv[2], argv[3]);
     else if (cmd == "fetch" && argc >= 3) cmdFetch(argv[2]);
+    else if (cmd == "remove" && argc >= 3) cmdRemove(argv[2]);
     else if (cmd == "list") cmdList();
     else std::cout << "Unknown or incomplete command.\n";
 }
