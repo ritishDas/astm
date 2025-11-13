@@ -39,6 +39,10 @@
         installPhase = ''
           mkdir -p $out/bin
           cp build/astm $out/bin/
+          
+        mkdir -p $out/share/bash-completion/completions
+
+        cp completions/astm.bash $out/share/bash-completion/completions/astm
         '';
       };
     };
