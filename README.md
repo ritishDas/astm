@@ -22,7 +22,7 @@ It keeps your files organized under `~/.local/share/astm/assets`, supports Git a
 ### 🧑‍💻 Using Make
 
 ```bash
-git clone https://github.com/<yourname>/astm.git
+git clone https://github.com/ritishDas/astm.git
 cd astm
 make
 sudo make install
