@@ -56,5 +56,5 @@ _astm_completions() {
     esac
 }
 
-complete -F _astm_completions astm
+complete -o default -o bashdefault -F _astm_completions astm
 
