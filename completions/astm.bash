@@ -9,7 +9,7 @@ _astm_completions() {
     # Top-level commands
     local commands="init add fetch remove list help version"
 
-    # Provide command list when completing first argument
+    # First argument → suggest commands
     if [[ $COMP_CWORD -eq 1 ]]; then
         COMPREPLY=( $(compgen -W "${commands}" -- "$cur") )
         return 0
@@ -20,31 +20,31 @@ _astm_completions() {
     # -------------------------------------------------------
     case "$cmd" in
         init)
-            # init <path> → complete directories
+            # init <path> → directories only
             COMPREPLY=( $(compgen -d -- "$cur") )
             return 0
             ;;
-        
+
         add)
             # add <name> <path>
             if [[ $COMP_CWORD -eq 2 ]]; then
-                # argument 2 = name → no special completion
+                # name → free text
                 return 0
             elif [[ $COMP_CWORD -eq 3 ]]; then
-                # argument 3 = path
+                # path → files or directories
                 COMPREPLY=( $(compgen -f -- "$cur") )
                 return 0
             fi
             ;;
 
         fetch|remove)
-            # fetch <name>, remove <name> → complete with stored assets
-            # If you store assets in ~/.astm/assets.txt or similar,
-            # adapt this command to fetch names.
-            local asset_file="$HOME/.config/astm/assets.txt"
-            if [[ -f "$asset_file" ]]; then
-                local names
-                names=$(cut -d' ' -f1 "$asset_file")
+            # fetch/remove <name> → use dynamic names from `astm list`
+            local names
+
+            # Capture output safely
+            names=$(astm list 2>/dev/null | awk '{print $1}')
+
+            if [[ -n "$names" ]]; then
                 COMPREPLY=( $(compgen -W "${names}" -- "$cur") )
             fi
             return 0
